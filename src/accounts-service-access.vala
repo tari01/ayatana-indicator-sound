@@ -1,6 +1,6 @@
 /*
- * -*- Mode:Vala; indent-tabs-mode:t; tab-width:4; encoding:utf8 -*-
  * Copyright 2016 Canonical Ltd.
+ * Copyright 2021 AyatanaIndicators
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,6 +16,7 @@
  *
  * Authors:
  *      Xavi Garcia <xavi.garcia.mena@canonical.com>
+ *      Robert Tari <robert@tari.in>
  */
 
 using PulseAudio;
@@ -130,7 +131,7 @@ public class AccountsServiceAccess : Object
         // Get master AccountsService object
         DBusProxy accounts_proxy;
         try {
-            accounts_proxy = yield DBusProxy.create_for_bus (BusType.SYSTEM, DBusProxyFlags.DO_NOT_LOAD_PROPERTIES | DBusProxyFlags.DO_NOT_CONNECT_SIGNALS, null, "org.freedesktop.Accounts", "/org/freedesktop/Accounts", "org.freedesktop.Accounts");
+            accounts_proxy = yield new DBusProxy.for_bus (BusType.SYSTEM, DBusProxyFlags.DO_NOT_LOAD_PROPERTIES | DBusProxyFlags.DO_NOT_CONNECT_SIGNALS, null, "org.freedesktop.Accounts", "/org/freedesktop/Accounts", "org.freedesktop.Accounts");
         } catch (GLib.Error e) {
             warning ("unable to get greeter proxy: %s", e.message);
             return;
@@ -143,9 +144,9 @@ public class AccountsServiceAccess : Object
             if (user_path_variant.check_format_string ("(o)", true)) {
                 user_path_variant.get ("(o)", out user_path);
 #if HAS_UT_ACCTSERVICE_SOUND_SETTINGS
-                _user_proxy = yield DBusProxy.create_for_bus (BusType.SYSTEM, DBusProxyFlags.GET_INVALIDATED_PROPERTIES, null, "org.freedesktop.Accounts", user_path, "com.ubuntu.AccountsService.Sound");
+                _user_proxy = yield new DBusProxy.for_bus (BusType.SYSTEM, DBusProxyFlags.GET_INVALIDATED_PROPERTIES, null, "org.freedesktop.Accounts", user_path, "com.ubuntu.AccountsService.Sound");
 #else
-                _user_proxy = yield DBusProxy.create_for_bus (BusType.SYSTEM, DBusProxyFlags.GET_INVALIDATED_PROPERTIES, null, "org.freedesktop.Accounts", user_path, "org.ayatana.AccountsService.Sound");
+                _user_proxy = yield new DBusProxy.for_bus (BusType.SYSTEM, DBusProxyFlags.GET_INVALIDATED_PROPERTIES, null, "org.freedesktop.Accounts", user_path, "org.ayatana.AccountsService.Sound");
 #endif
             } else {
                 warning ("Unable to find user name after calling FindUserByName. Expected type: %s and obtained %s", "(o)", user_path_variant.get_type_string () );
